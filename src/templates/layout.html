@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UnJobbed- find jobs now!</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bulma Version 0.7.2-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+    <!-- <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.js" /> -->
+    <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css" />
+
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='unjobbed.css') }}">
+</head>
+
+<body>
+    <section class="hero is-fullheight">
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-item has-text-white" href="/">
+                            <strong>UnJobbed</strong>
+                        </a>
+                        <span class="navbar-burger burger has-text-white" data-target="navbarMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+                    <div id="navbarMenu" class="navbar-menu">
+                        <div class="navbar-end">
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/">
+                                    <span class="icon">
+                                        <i class="fa fa-home"></i>
+                                    </span>
+                                    <span>Home</span>
+                                </a>
+                            </span>
+                            {% if logged_in %}
+                                <span class="navbar-item">
+                                    <a class="button is-white is-outlined" href="/profile">
+                                        <span class="icon">
+                                            <i class="fa fa-user has-text-white"></i>
+                                        </span>
+                                        <span>Profile</span>
+                                    </a>
+                                </span>
+                                <span class="navbar-item">
+                                    <a class="button is-white is-outlined" href="/saved_searches">
+                                        <span class="icon">
+                                            <i class="fa fa-save has-text-white"></i>
+                                        </span>
+                                        <span>Saved Searches</span>
+                                    </a>
+                                </span>
+                                <span class="navbar-item">
+                                    <a class="button is-white is-outlined" href="/resume">
+                                        <span class="icon">
+                                            <i class="fa fa-file has-text-white"></i>
+                                        </span>
+                                        <span>Resume</span>
+                                    </a>
+                                </span>
+                                <span class="navbar-item">
+                                    <a class="button is-white is-outlined" href="/applications">
+                                        <span class="icon">
+                                            <i class="fa fa-paper-plane has-text-white"></i>
+                                        </span>
+                                        <span>Submitted Applications</span>
+                                    </a>
+                                </span>
+                                <span class="navbar-item">
+                                    <a class="button is-white is-outlined" href="/logout">
+                                        <span class="icon">
+                                            <i class="fa fa-sign-in"></i>
+                                        </span>
+                                        <span>Logout</span>
+                                    </a>
+                                </span>
+                            {% else %}
+                            <span class="navbar-item">
+                                <a class="button is-white is-outlined" href="/login/">
+                                    <span class="icon">
+                                        <i class="fa fa-sign-in"></i>
+                                    </span>
+                                    <span>Login</span>
+                                </a>
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            </div>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if error %}
+                            <div class="notification is-danger">
+                                <button class="delete"></button>
+                                {{message}}
+                            </div>
+                        {% endif %}
+                        {% if warning %}
+                            <div class="notification is-warning">
+                                <button class="delete"></button>
+                                {{message}}
+                            </div>
+                        {% endif %}
+                        {% if success %}
+                            <div class="notification is-success">
+                                <button class="delete"></button>
+                                {{message}}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block body %}{% endblock %}
+
+    </section>
+    <!-- <script type="text/javascript" scr="https://unpkg.com/buefy/dist/buefy.min.js" > -->
+</body>
+<script
+  src="http://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script type = "text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Get all "navbar-burger" elements
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+    // Check if there are any navbar burgers
+    if ($navbarBurgers.length > 0) {
+
+    // Add a click event on each of them
+    $navbarBurgers.forEach( el => {
+        el.addEventListener('click', () => {
+
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+
+        });
+    });
+    }
+    // commented out due to errors - getElementsByClassName
+    var close = document.getElementsByClassName('delete')[0];
+    var flmsg = document.getElementsByClassName('notification')[0];
+    close.onclick = function() {
+        flmsg.style.display = "none";
+    }
+});
+</script>
+</html>

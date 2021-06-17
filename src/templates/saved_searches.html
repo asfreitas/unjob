@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="hero-body">
+    <div class="container has-text-centered">
+        <div class="column is-6 is-offset-3">
+            <h1 class="title has-text-white">
+                Find Your Next Gig
+            </h1>            
+            <br>
+            {% if TopFive %}
+                <h1 class="subtitle has-text-white">
+                    {% for top in TopFive %}
+                        <ul>
+                            <li class="has-text-white">{{top.prevSearch}}</li>
+                        </ul>
+                    {% endfor %}
+                    <br>
+                    <br>
+                    ... or start a new search using the fields below.
+                </h1>
+            {% else %}
+                <h1 class="subtitle has-text-white">
+                    You have no saved searches.  What are you waiting for?
+                </h1>
+            {% endif %}
+            <hr>
+            {% if TopFive %}
+                <h1 class="subtitle has-text-white">
+                    Use one of your Saved Searches...
+                </h1>
+            {% else %}
+                <h1 class="subtitle has-text-white">
+                    Use the fields below to find your new favorite job
+                </h1>
+            {% endif %}
+            <div class="box">
+                <form method="GET" action="/search_results">
+                    <div class="field is-grouped">
+                        <div class="control is-expanded">
+                            <input class="input" type="text" placeholder="Job Title" autofocus="" name="jobTitle" id="jobTitle">
+                        </div>
+                        <div class="control is-expanded">
+                            <input class="input" type="text" placeholder="Location" name="location" id="location">
+                        </div>
+                        <button class="button is-block is-info" id="btnFind">Find Jobs</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

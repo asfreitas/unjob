@@ -1,0 +1,199 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="hero-body resume_builder">
+    <div class="container has-text-centered">
+        <div class="column is-8 is-offset-2">
+          <section>
+            <h1 class="title has-text-white">
+                My Resume
+            </h1>
+            <div class="box">
+
+              {% for row in data %}
+                  <div class="resume_item has-text-left">
+                      <span class = "is-size-5">{{row.job_title}} at {{row.employer}}</span><br>
+                      {% if row.currently_employed %}
+                        <span class="is-size-7">{{row.start_date}} - Present</span><br>
+                      {% else %}
+                        <span class="is-size-7">{{row.start_date}} - {{row.end_date}}</span><br>
+                      {% endif %}
+
+                      <p class="is-size-7">{{row.job_desc}}</p>
+                      <button class="button is-primary btnDelete" data-id="{{row.id}}" type="button" name="button">Delete</button>
+                      <hr>
+                  </div>
+              {% endfor %}
+
+
+                <form method="POST" action="/resume_builder_add" id="resume_builder_add">
+                  <h2 class="title is-5">Add Work History</h2>
+                  <!-- job title  -->
+                  <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                      <label class="label">Job Title</label>
+                    </div>
+                    <div class="field-body">
+                      <div class="field">
+                        <p class="control is-normal">
+                          <input class="input" name="job_title" id="job_title" type="text" placeholder="Ex: Lead Software Engineer">
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- company name -->
+                  <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                      <label class="label">Employer</label>
+                    </div>
+                    <div class="field-body">
+                      <div class="field">
+                        <p class="control is-normal">
+                          <input class="input" name="employer" id="employer" type="text" placeholder="Ex: XYZ Industries">
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                <!-- start date  -->
+                <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                    <label class="label">Start Date</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                          <input class="date input is-normal" name="start_date" id="start_date" type="date">
+                        </div>
+                     </div>
+                  </div>
+                </div>
+
+                <!-- end date  -->
+                <div class="field is-horizontal" id="end_date_field">
+                  <div class="field-label is-normal">
+                    <label class="label">End Date</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                          <input class="date input is-normal" name="end_date" id="end_date" type="date" default=0>
+                        </div>
+                     </div>
+                  </div>
+
+                </div>
+                <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                    <label class="label"></label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field has-text-left">
+                      <label class="checkbox">
+
+                        <input type="checkbox" value="1" name="currently_employed" id="currently_employed">
+                        <input type='hidden' value='0' name='currently_employed'>
+                         Currently Employed
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <!--job desc -->
+                <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                    <label class="label">Description</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                      <div class="control">
+                        <textarea name="job_desc" id="job_desc" name="job_desc" class="textarea" placeholder="Describe your position and job responsibilities here..."></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button id="addBtn" type="submit" class="button is-primary">Add to Resume</button>
+                <!-- <div class="has-text-right">
+                  <button id="addBtn" type="submit" class="button is-block is-info is-small has-text-right">+</button>
+                </div> -->
+              </form>
+            </div> <!-- close box -->
+            <br>
+          </section>
+
+          <section>
+            <h1 class="title has-text-white">
+                Upload PDF Documents
+            </h1>
+           <form method=post action={{url_for('file_handler')}} enctype=multipart/form-data>
+            <div class="box">
+
+                    {% if uploaded_resume %}
+                    <div class="notification is-link">
+                        <h1>You have uploaded a resume to Unjobbed. You can access it  <a href="/static/user_documents/{{ session['username'] }}_resume.pdf">here</a>.</h1>
+                    </div>
+                    {% endif %}
+
+
+                    {% if uploaded_coverletter %}
+                    <div class="notification is-link">
+                    <h1>You have uploaded a cover letter to Unjobbed. You can access it  <a href="/static/user_documents/{{ session['username'] }}_coverletter.pdf">here</a>.</h1>
+                    </div>
+                    {% endif %}
+
+                  <div class="control">
+                    <label class="radio">
+                    <input type="radio" name="upload_type" value="resume" checked> Resume
+                    </label>
+                    <label class="radio">
+                    <input type="radio" name="upload_type" value="cover_letter"> Cover Letter<p>
+                    </label>
+                  </div>
+
+          				<div class="file has-name is-fullwidth">
+          				  <label class="file-label">
+          					<input class="file-input" type="file" name="file" >
+          					<span class="file-cta">
+          					  <span class="file-icon">
+          						<i class="fa fa-upload"></i>
+          					  </span>
+          					  <span class="file-label">
+          						Choose a file…
+          					  </span>
+          					</span>
+          					<span class="file-name">
+
+          					</span>
+          				  </label>
+          				</div>
+        			<br>
+        			<button value="Upload" type="submit" class="button is-primary">Upload Document</button>
+            </div> <!-- close box -->
+            </form>
+
+          </section>
+        </div> <!-- close column -->
+    </div> <!-- close container-->
+</div> <!-- close .hero-body -->
+
+<script>
+  window.onload = function(){
+  $("#currently_employed").click(function(){
+    // $('#end_date').prop('disabled', function(index, value) { return !value; });
+    $('#end_date_field').toggle();
+  });
+
+  $(".btnDelete").click(function(){
+    var resume_item_id = $(this).data('id');
+    $(this).parent().remove();
+    $.post("/resume_builder_delete",
+    {
+      resume_item_id: resume_item_id
+    },
+    function(data, status){
+
+    });
+  });
+};
+</script>
+{% endblock %}

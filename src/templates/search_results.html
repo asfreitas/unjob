@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+{% block body %}
+<!-- <p id="location" style="display:none">{{location}}</p>
+<p id="jobTitle" style="display:none">{{jobTitle}}</p> -->
+
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <div class="column is-8 is-offset-2">
+                <h3 class="title has-text-white">Results for {{jobTitle}} in {{location}}</h3>
+            </div>
+            <div class="search_results">
+                <div class="lds-facebook">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <div class="box column is-8 is-offset-2" id="job_listings">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- <section>
+</section> -->
+
+<script>
+// TODO: Link script out of html
+window.onload = function ajaxcall() {
+
+
+    var httpRequest = new XMLHttpRequest();
+    // var location = document.getElementById("location").innerText;
+    // var jobTitle = document.getElementById("jobTitle").innerText;
+    var location = '{{location}}';
+    var jobTitle = '{{jobTitle}}';
+    jobTitle.replace(/\s+/g, '-');
+    location.replace(/\s+/g, '-');
+    var apiURL = 'http://localhost:3000/crawl.json?start_requests=false&spider_name=indeed_jobs&url=https://www.indeed.com/q-' + jobTitle + '-l-' + location + '-jobs.html'
+    var searchURL = window.location.href;
+    httpRequest.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            // hide the loader
+            var loader = document.querySelector('.lds-facebook');
+            loader.style.display = "none";
+
+            //document.getElementById("job_listings").innerHTML = this.responseText;
+            var scraper_output_json = this.responseText;
+            scraper_output_obj = JSON.parse(scraper_output_json);
+            console.log(scraper_output_obj);
+
+            for (var i = 1; i <= (Object.keys(scraper_output_obj.items).length); i++) { // TODO: clean up formatting and classes
+                var jobListingContainer = document.createElement("div");
+                jobListingContainer.id = "job_search_card" + i;
+                var location = document.getElementById("job_listings").lastChild;
+                location.parentNode.appendChild(jobListingContainer, location);
+
+                var jobListingJobTitle = document.createElement("h4");
+                jobListingJobTitle.className = "job_search_card_j_title";
+                document.getElementById("job_search_card" + i).appendChild(jobListingJobTitle);
+                jobListingJobTitle.innerHTML = scraper_output_obj.items[i].title;
+
+                var jobListingCompany = document.createElement("p");
+                jobListingCompany.className = "job_search_card_company";
+                document.getElementById("job_search_card" + i).appendChild(jobListingCompany);
+                jobListingCompany.innerHTML = scraper_output_obj.items[i].company;
+
+                var jobListingLocation = document.createElement("p");
+                jobListingLocation.className = "job_search_card_location";
+                document.getElementById("job_search_card" + i).appendChild(jobListingLocation);
+                jobListingLocation.innerHTML = scraper_output_obj.items[i].location;
+
+                var jobListingSummary = document.createElement("p");
+                jobListingSummary.className = "job_search_card_summary";
+                document.getElementById("job_search_card" + i).appendChild(jobListingSummary);
+                jobListingSummary.innerHTML = scraper_output_obj.items[i].summary;
+
+                var jobListingDescLink = document.createElement("a");
+                jobListingDescLink.className = "job_search_card_link";
+                document.getElementById("job_search_card" + i).appendChild(jobListingDescLink);
+                jobListingDescLink.innerHTML = "READ MORE";
+                jobListingDescLink.href = scraper_output_obj.items[i].summary_url;
+            }
+        }
+    };
+
+    httpRequest.open('GET', apiURL, true);
+    // httpRequest.open('GET', 'http://localhost:3000/crawl.json?start_requests=false&spider_name=indeed_jobs&url=https://www.indeed.com/q-' + jobTitle + '-l-' + location + '-jobs.html', true);
+    //httpRequest.open('GET', 'http://localhost:3000/crawl.json?start_requests=false&spider_name=indeed_jobs&url=https://www.indeed.com/q-programmer-l-Portland-me-jobs.html', true);
+    httpRequest.send();
+
+    //alert(searchURL);
+    // make POST request via AJAX
+      $.post("/saved_searches",
+      {
+        jobTitle: '{{jobTitle}}',
+        location: '{{location}}',
+        searchURL: searchURL
+      });
+
+};
+</script>
+{% endblock %}

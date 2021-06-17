@@ -1,0 +1,297 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="notification is-danger" id="sad">
+    <button class="delete"></button>
+    <div id="sadMsg"></div>
+</div>
+<div class="notification is-success" id="happy">
+    <button class="delete"></button>
+    <div id="happyMsg"></div>
+</div>
+<div class="hero-body">
+    <div class="container has-text-centered">
+        <div class="column is-6 is-offset-3">
+            <h1 class="title has-text-white">
+                Find a new gig
+            </h1>
+            <h2 class="subtitle has-text-white">
+                At UnJobbed, we streamline your job search by searching across multiple job sites to find the right job for you.  Place all your applications through UnJobbed. Receive all your responses via UnJobbed.  Find your next job now, at UnJobbed.
+            </h2>
+            <div class="box">
+                <form method="GET" action="/search_results">
+                    <div class="field is-grouped">
+                        <div class="control is-expanded">
+                            <input class="input" type="text" placeholder="Job Title" autofocus="" name="jobTitle" id="jobTitle">
+                        </div>
+                        <div class="control is-expanded">
+                            <input class="input" type="text" placeholder="Location" name="location" id="location">
+                        </div>
+                        <button class="button is-block is-info" id="btnFind">Find Jobs</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="thisModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+        <p class="modal-card-title" id="mdlTitle"></p>
+        <p class="modal-card-title" id="mdlTitleLogin">Login</p>
+        <p class="modal-card-title" id="mdlTitleSignUp">Sign Up</p>
+        <div id="closeMdl"><button class="delete" aria-label="close"></button></div>       
+        </header>
+        <section class="modal-card-body">
+            <div class="notification is-danger" id="sadLogin">
+                <button id="closeWarn" class="delete"></button>         
+                <div id="sadMsg2"></div>
+            </div>
+            <p id="notLogText">You are not logged in.  Logging in allows us to save your job searches for your convenience later.  Would you like to login?</p>
+            <div class="field" style="display:none" id="Hdremailaddress">
+                <div class="control">
+                    <input class="input is-large" type="email" placeholder="Your Email" autofocus="" id="emailaddress">
+                </div>
+            </div>             
+            <div class="field" style="display:none" id="Hdrpword">
+                <div class="control">
+                    <input class="input is-large" type="password" placeholder="Your Password" id="pword">
+                </div>
+            </div>
+            <div style="display:none" id="HdrbtnLogin"><button class="button is-block is-info is-large is-fullwidth" id="btnLogin">Login</button></div>          
+            <div class="field" style="display:none" id="newUserName">
+                <div class="control">
+                    <input class="input is-large" type="text" placeholder="Your Username" autofocus="" name="username" id="newUserNameField">
+                </div>
+            </div>
+            <div class="field" style="display:none" id="newEmail">
+                <div class="control">
+                    <input class="input is-large" type="email" placeholder="Your Email" autofocus="" name="emailaddress" id="newEmailField">
+                </div>
+            </div>
+            <div class="field" style="display:none" id="newPword">
+                <div class="control">
+                    <input class="input is-large" type="password" placeholder="Your Password" name="pword" id="newPwordField">
+                </div>
+            </div>
+            <div class="field" style="display:none" id="newConfPword">
+                <div class="control">
+                    <input class="input is-large" type="password" placeholder="Confirm Password" name="confpword" id="newConfPwordField">
+                </div>
+            </div>
+            <div style="display:none" id="newLoginBtn"><button class="button is-block is-info is-large is-fullwidth">Create Login</button></div>           
+        </section>
+        <footer class="modal-card-foot">
+        <button id="btnYes" class="button is-success">Login</button>
+        <button id="btnCreate" class="button is-info">Create Login</button>
+        <button id="btnNo" class="button">No</button>
+        </footer>
+    </div>
+</div>
+<script type = "text/javascript">
+    var warn = document.getElementById('sad');
+    var success = document.getElementById('happy');
+    var warnMsg = document.getElementById('sadMsg');
+    var successMsg = document.getElementById('happyMsg');
+    var linkModal = document.getElementById('thisModal');
+    var closeMdl = document.getElementById('closeMdl'); 
+    var closeWarn = document.getElementById('closeWarn'); 
+    warn.style.display = 'none';
+    success.style.display = 'none';
+
+    var Hdremailaddress = document.getElementById('Hdremailaddress');
+    var Hdrpword = document.getElementById('Hdrpword');
+    var HdrbtnLogin = document.getElementById('HdrbtnLogin');
+    var sadLogin = document.getElementById('sadLogin');
+    var sadMsg2 = document.getElementById('sadMsg2');
+    sadLogin.style.display = 'none';
+
+    var emailaddress = document.getElementById('emailaddress');
+    var pword = document.getElementById('pword');
+    var btnLogin = document.getElementById('btnLogin');
+
+    var logs = '{{ logged_in }}';
+
+    var notLogText = document.getElementById('notLogText');
+    var btnYes = document.getElementById('btnYes');
+    var btnNo = document.getElementById('btnNo');
+    var btnCreate = document.getElementById('btnCreate');
+
+    var btnFind = document.getElementById('btnFind');
+
+    var newUserName = document.getElementById('newUserName');
+    var newEmail = document.getElementById('newEmail');
+    var newPword = document.getElementById('newPword');
+    var newConfPword = document.getElementById('newConfPword');
+    var newLoginBtn = document.getElementById('newLoginBtn');
+
+    var titleLogin = document.getElementById('mdlTitleLogin');
+    var titleSignUp = document.getElementById('mdlTitleSignUp');
+
+    /*btnFind.onclick = function(event) {     
+        
+        var job = checkIfEmpty(document.getElementById('jobTitle').value);
+        var loc = checkIfEmpty(document.getElementById('location').value);
+        
+        if(job == "null"){
+            warn.style.display = 'block';
+            warnMsg.innerHTML = 'Please fill in a job title';
+            return false;
+        }
+        else if(loc == "null"){
+            warn.style.display = 'block';
+            warnMsg.innerHTML = 'Please fill in a location';
+            return false;
+        }
+        else
+        {
+            if(logs)
+            {
+                alert('yoooo2');
+                alert(logs);
+
+                var newUrl = "/search_results.html" ;
+                window.location.replace(newUrl);
+            }
+            else
+            {
+                alert('yoooo');
+                alert(logs);
+                linkModal.style.display = 'block';
+                titleLogin.style.display = 'none';
+                titleSignUp.style.display = 'none';
+                return false;
+            }
+            
+        }
+    };*/
+
+    btnYes.onclick = function(event){
+        Hdremailaddress.style.display = 'block';
+        Hdrpword.style.display = 'block';
+        HdrbtnLogin.style.display = 'block';
+        titleLogin.style.display = 'block';
+        btnYes.style.display = 'none';
+        btnCreate.style.display = 'none';
+        btnNo.style.display = 'none';
+        notLogText.style.display = 'none';
+        return false;
+    };
+
+    btnCreate.onclick = function(event){
+        newUserName.style.display = 'block';
+        newEmail.style.display = 'block';
+        newPword.style.display = 'block';
+        newConfPword.style.display = 'block';
+        newLoginBtn.style.display = 'block';
+        titleSignUp.style.display = 'block';
+        titleLogin.style.display = 'note';
+        btnYes.style.display = 'none';
+        notLogText.style.display = 'none';
+        btnCreate.style.display = 'none';
+        btnNo.style.display = 'none';
+        notLogText.style.display = 'none';
+    };
+
+    btnNo.onclick = function(event){
+        var newUrl = "/search_results";
+        window.location.replace(newUrl);
+    };
+
+    function checkIfEmpty(param){
+        if(param == ""){
+            return "null";
+        } else {
+            return param;
+        }
+    };
+
+    window.onclick = function(event) {
+        if (event.target.className == 'modal-background'){
+            linkModal.style.display = 'none';
+            resetModal();
+        }
+    } 
+
+    closeMdl.onclick = function(event) {
+        linkModal.style.display = 'none';
+        resetModal();
+    } 
+    closeWarn.onclick = function(event){
+        sadLogin.style.display = 'none';
+    }
+
+    function resetModal(){
+        Hdremailaddress.style.display = 'none';
+        Hdrpword.style.display = 'none';
+        HdrbtnLogin.style.display = 'none';
+        btnYes.style.display = 'block';
+        btnCreate.style.display = 'block';
+        btnNo.style.display = 'block';
+        notLogText.style.display = 'block';
+        newUserName.style.display = 'none';
+        newEmail.style.display = 'none';
+        newPword.style.display = 'none';
+        newConfPword.style.display = 'none';
+        newLoginBtn.style.display = 'none';
+    }
+
+    btnLogin.onclick = function(event) {
+        var emailaddress = checkIfEmpty(document.getElementById('emailaddress').value);
+        var pword = checkIfEmpty(document.getElementById('pword').value);
+
+        if(emailaddress == "null"){
+            sadLogin.style.display = 'block';
+            sadMsg2.innerHTML = 'Please fill your email address';
+            return false;
+        }
+        else if(pword == "null"){
+            sadLogin.style.display = 'block';
+            sadMsg2.innerHTML = 'Please fill in your password';
+            return false;
+        }
+        else{
+            //login
+            var job = checkIfEmpty(document.getElementById('jobTitle').value);
+            var loc = checkIfEmpty(document.getElementById('location').value);
+
+            var newUrl = "/login_js/" + emailaddress + "/" + pword + "/" + job + "/" + loc + "/";
+            window.location.replace(newUrl);
+        }
+    } 
+
+    newLoginBtn.onclick = function(event){
+        var chkNewUserName = checkIfEmpty(document.getElementById('newUserNameField').value);
+        var newEmail = checkIfEmpty(document.getElementById('newEmailField').value);
+        var newPword = checkIfEmpty(document.getElementById('newPwordField').value);
+        var newConfPword = checkIfEmpty(document.getElementById('newConfPwordField').value);
+
+        if(chkNewUserName == "null"){
+            sadLogin.style.display = 'block';
+            sadMsg2.innerHTML = 'Please fill your username';
+            return false;
+        }
+        else if(newEmail == "null"){
+            sadLogin.style.display = 'block';
+            sadMsg2.innerHTML = 'Please fill in your email address';
+            return false;
+        }
+        else if(newPword == "null"){
+            sadLogin.style.display = 'block';
+            sadMsg2.innerHTML = 'Please fill in a password';
+            return false;
+        }
+        else if(newConfPword == "null"){
+            sadLogin.style.display = 'block';
+            sadMsg2.innerHTML = 'Please fill confirm your password';
+            return false;
+        }
+        else
+        {
+            //TODO- create login
+            
+        }
+    }
+</script>
+{% endblock %}
